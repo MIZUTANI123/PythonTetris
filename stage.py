@@ -8,8 +8,10 @@ class Stage:
     WIDTH = 10 # 盤面の幅
     HEIGHT = 20 # 盤面の幅高さ
     NONE = 0 # 空マス
-    BLOCK = 1 # ブロックマス
-    FIX = 2 # 固定ブロックマス
+    BLOCK = [10, 11, 12, 13, 14, 15, 16] # ブロックマス
+    FIX = [20, 21, 22, 23, 24, 25, 26, 27] #固定ブロックマス
+    #BLOCK = 1 # ブロックマス
+    #FIX = 2 # 固定ブロックマス
 
     def __init__(self):
         """
@@ -47,11 +49,6 @@ class Stage:
 
 
 
-
-
-
-
-
     def input(self, key):
         """
         キー入力を受け付けるメソッド
@@ -69,7 +66,7 @@ class Stage:
             if not self.is_collision_left():
                 self.block.x -= 1
         if key == 's':
-                self.hard_drop()
+            self.hard_drop()
         if key == 'd':
             if not self.is_collision_right():
                 self.block. x += 1
@@ -97,11 +94,11 @@ class Stage:
         for i in range(block.Block.SIZE):
             for j in range(block.Block.SIZE):
                 # 次の角度のブロック情報を取得する
-                if self.block.get_cell_data(self.type, n_rot, j, i) == Stage.BLOCK:
+                if self.block.get_cell_data(self.type, n_rot, j, i) in Stage.BLOCK:
                     if self.is_out_of_stage(b_x + j, b_y + i):
                         return False
-                    #固定ブロックとの衝突チェック
-                    if self.data[b_y + i][b_x + j] == Stage.FIX:
+                    # 固定ブロックとの衝突チェック
+                    if self.data[b_y + i][b_x + j] in Stage.FIX:
                         return False
         return True
 
@@ -127,15 +124,17 @@ class Stage:
         # Stageの状態を一度リセット
         for i in range(Stage.HEIGHT):
             for j in range(Stage.WIDTH):
-                if self.data[i][j] == Stage.BLOCK:
+                if self.data[i][j] in Stage.BLOCK:
                     self.data[i][j] = Stage.NONE
 
         # ブロックデータをステージに反映
         for i in range(block.Block.SIZE):
             for j in range(block.Block.SIZE):
-                if self.block.get_cell_data(b_t, b_r, j, i) == Stage.BLOCK:
+                if self.block.get_cell_data(b_t, b_r, j, i) in Stage.BLOCK:
                     if not self.is_out_of_stage(b_x + j, b_y + i):
-                        self.data[b_y + i][b_x + j] = Stage.BLOCK
+                        self.data[b_y + i][b_x + j] = self.block.get_cell_data(b_t, b_r, j, i)
+                        #self.data[b_y + i][b_x + j] = Stage.BLOCK
+
 
     def __fix_block(self):
         """
@@ -148,8 +147,9 @@ class Stage:
 
         for i in range(block.Block.SIZE):
             for j in range(block.Block.SIZE):
-                if self.block.get_cell_data(b_t, b_r, j, i) == Stage.BLOCK:
-                    self.data[b_y + i][b_x + j] = Stage.FIX
+                if self.block.get_cell_data(b_t, b_r, j, i) in Stage.BLOCK:
+                    self.data[b_y + i][b_x + j] = self.block.get_cell_data(b_t, b_r, j, i) + 10
+                    #self.data[b_y + i][b_x + j] = Stage.FIX
 
 
     def is_out_of_stage(self, x, y):
@@ -178,12 +178,12 @@ class Stage:
         for i in range(block.Block.SIZE):
             for j in range(block.Block.SIZE):
                 # 取得したブロックの1マスのデータがBLOCK(1)だった場合
-                if self.block.get_cell_data(b_t, b_r, j, i) == Stage.BLOCK:
+                if self.block.get_cell_data(b_t, b_r, j, i) in Stage.BLOCK:
                     # 対象のブロックマスの位置から一つ下げたマスがステージの範囲外だった場合
                     if self.is_out_of_stage(x + j, y + i + 1):
                         return True
                     # 対象のブロックマスの位置から一つ下げたマスが固定されたブロックのマス(2)だった場合
-                    if self.data[y + i + 1][x + j] == Stage.FIX:
+                    if self.data[y + i + 1][x + j] in Stage.FIX:
                         return True
         # どの条件にも当てはまらない場合は常にどこにも衝突していない
         return False
@@ -206,12 +206,12 @@ class Stage:
         for i in range(block.Block.SIZE):
             for j in range(block.Block.SIZE):
                 # 取得したブロックの1マスのデータがBLOCK(1)だった場合
-                if self.block.get_cell_data(b_t, b_r, j, i) == Stage.BLOCK:
+                if self.block.get_cell_data(b_t, b_r, j, i) in Stage.BLOCK:
                     # 対象のブロックマスの位置から一つ左のマスがステージの範囲外だった場合
                     if self.is_out_of_stage(x + j - 1, y + i):
                         return True
                     # 対象のブロックマスの位置から一つ左のマスが固定されたブロックのマス(2)だった場合
-                    if self.data[y + i][x + j - 1] == Stage.FIX:
+                    if self.data[y + i][x + j - 1] in Stage.FIX:
                         return True
         # どの条件にも当てはまらない場合は常にどこにも衝突していない
         return False
@@ -234,12 +234,12 @@ class Stage:
         for i in range(block.Block.SIZE):
             for j in range(block.Block.SIZE):
                 # 取得したブロックの1マスのデータがBLOCK(1)だった場合
-                if self.block.get_cell_data(b_t, b_r, j, i) == Stage.BLOCK:
+                if self.block.get_cell_data(b_t, b_r, j, i) in Stage.BLOCK:
                     # 対象のブロックマスの位置から一つ右のマスがステージの範囲外だった場合
                     if self.is_out_of_stage(x + j + 1, y + i):
                         return True
                     # 対象のブロックマスの位置から一つ右のマスが固定されたブロックのマス(2)だった場合
-                    if self.data[y + i][x + j + 1] == Stage.FIX:
+                    if self.data[y + i][x + j + 1] in Stage.FIX:
                         return True
         # どの条件にも当てはまらない場合は常にどこにも衝突していない
         return False
@@ -254,7 +254,7 @@ class Stage:
         for i in range(Stage.HEIGHT):
             flg = True
             for j in range(Stage.WIDTH):
-                if self.data[i][j] != Stage.FIX:
+                if self.data[i][j] not in Stage.FIX:
                     flg = False
                     break
             self.remove_line[i] = flg
@@ -304,11 +304,11 @@ class Stage:
         for i in range(block.Block.SIZE):
             for j in range(block.Block.SIZE):
                 cell_data = self.block.get_cell_data(t, r, j, i)
-                if cell_data == Stage.BLOCK:
+                if cell_data in Stage.BLOCK:
                     # 範囲外チェック
                     if not self.is_out_of_stage(x + j, y + i):
                         #衝突チェック
-                        if self.data[y + i][x + j] == Stage.FIX:
+                        if self.data[y + i][x + j] in Stage.FIX:
                             return True
         # どの条件にも当てはまらない場合は常にどこにも衝突していない
         return False

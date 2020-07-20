@@ -23,8 +23,18 @@ class Game:
         self.root.bind('<KeyPress>', self.__input)
         self.canvas = tkinter.Canvas(self.root, width=self.width, height=self.height, bg='black')
         self.stage = stage.Stage()
+
+        self.img_blocks = [tkinter.PhotoImage(file='o.png'),
+                           tkinter.PhotoImage(file='i.png'),
+                           tkinter.PhotoImage(file='l.png'),
+                           tkinter.PhotoImage(file='j.png'),
+                           tkinter.PhotoImage(file='s.png'),
+                           tkinter.PhotoImage(file='z.png'),
+                           tkinter.PhotoImage(file='t.png')]
+        """
         self.img_block = tkinter.PhotoImage(file='block.png')
         self.img_fix = tkinter.PhotoImage(file='fix.png')
+        """
         self.img_shadow = tkinter.PhotoImage(file='shadow.png')
         self.img_game_over = tkinter.PhotoImage(file='game_over.png')
         self.speed = 300
@@ -76,6 +86,7 @@ class Game:
             #速度を変更
             self.speed -= 1
 
+
     def __render(self, is_end=False):
         """
         gameの描画処理を定義するメソッド
@@ -88,7 +99,7 @@ class Game:
 
                 if is_end:
                     #GameOver処理を描画
-                    if cell_data == stage.Stage.FIX:
+                    if cell_data in stage.Stage.FIX:
                         # ゲームオーバーのブロックを描画する
                         self.canvas.create_image(x * block.Block.SCALE, y * block.Block.SCALE, image=self.img_game_over,
                                                  anchor='nw', tag='block')
@@ -100,20 +111,22 @@ class Game:
                         self.canvas.create_rectangle(x * block.Block.SCALE, y * block.Block.SCALE, x * block.Block.SCALE + block.Block.SCALE, y * block.Block.SCALE + block.Block.SCALE, fill='black', tag='block')
                     """
                     # 取得したマスのデータがブロックだった場合
-                    if cell_data == stage.Stage.BLOCK:
+                    if cell_data in stage.Stage.BLOCK:
                         # ブロックの画像を描画する。
                         self.canvas.create_image(
-                            x * block.Block.SCALE, # x座標
-                            y * block.Block.SCALE, # y座標
-                            image=self.img_block,  # 描画画像
+                            x * block.Block.SCALE,  # x座標
+                            y * block.Block.SCALE,  # y座標
+                            image=self.img_blocks[cell_data-10],  # 描画画像
                             anchor='nw',  # アンカー
-                            tag='block' # タグ
+                            tag='block'  # タグ
                         )
-                    elif cell_data == stage.Stage.FIX:
+                    elif cell_data in stage.Stage.FIX:
                         # Fixの画像を描画する。
-                        self.canvas.create_image(x * block.Block.SCALE, y * block.Block.SCALE, image=self.img_fix, anchor='nw', tag='block')
+                        self.canvas.create_image(x * block.Block.SCALE, y * block.Block.SCALE, image=self.img_blocks[cell_data-20], anchor='nw', tag='block')
 
         self.__render_shadow(is_end)
+
+
 
     def __render_shadow(self, is_end=False):
         """
@@ -128,7 +141,7 @@ class Game:
         if not is_end:
             for i in range(block.Block.SIZE):
                 for j in range(block.Block.SIZE):
-                    if self.stage.block.get_cell_data(type, rot, j, i) == stage.Stage.BLOCK:
+                    if self.stage.block.get_cell_data(type, rot, j, i) in stage.Stage.BLOCK:
                         self.canvas.create_image(
                             (j + x) * block.Block.SCALE,                       # x0座標
                             (i + y) * block.Block.SCALE,                       # y0座標
@@ -142,8 +155,8 @@ class Game:
                                                      (i + y) * block.Block.SCALE,                       # y0座標
                                                      (j + x) * block.Block.SCALE + block.Block.SCALE,   # x1座標
                                                      (i + y) * block.Block.SCALE + block.Block.SCALE,   # y1座標
-                                                     fill='black',                                      # 装飾色
-                                                     outline='yellow',                                  # 枠線
+                                                     fill='LavenderBlush2',                                      # 装飾色
+                                                     outline='gray',                                  # 枠線
                                                      tag='block')
                         """
 
