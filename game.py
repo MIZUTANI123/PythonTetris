@@ -22,6 +22,7 @@ class Game:
         self.root = tkinter.Tk()
         self.root.bind('<KeyPress>', self.__input)
         self.canvas = tkinter.Canvas(self.root, width=self.width, height=self.height, bg='black')
+
         self.stage = stage.Stage()
 
         self.img_blocks = [tkinter.PhotoImage(file='o.png'),
@@ -31,10 +32,7 @@ class Game:
                            tkinter.PhotoImage(file='s.png'),
                            tkinter.PhotoImage(file='z.png'),
                            tkinter.PhotoImage(file='t.png')]
-        """
-        self.img_block = tkinter.PhotoImage(file='block.png')
-        self.img_fix = tkinter.PhotoImage(file='fix.png')
-        """
+
         self.img_shadow = tkinter.PhotoImage(file='shadow.png')
         self.img_game_over = tkinter.PhotoImage(file='game_over.png')
         self.speed = 300
@@ -50,6 +48,7 @@ class Game:
         gameの初期化を行うメソッド
         """
         self.__make_window()
+        self.__display_score()
         self.__game_loop()
         self.root.mainloop()
 
@@ -70,6 +69,7 @@ class Game:
             self.root.after(self.speed, self.__game_loop)
         else:
             self.__render(True)
+
 
     def __input(self, e):
         """
@@ -125,6 +125,7 @@ class Game:
                         self.canvas.create_image(x * block.Block.SCALE, y * block.Block.SCALE, image=self.img_blocks[cell_data-20], anchor='nw', tag='block')
 
         self.__render_shadow(is_end)
+        self.__display_score(is_end)
 
 
 
@@ -160,3 +161,5 @@ class Game:
                                                      tag='block')
                         """
 
+    def __display_score(self, is_end=False):
+        self.canvas.create_text(40, 20, text='score = ' + str(self.stage.cnt), fill='white', font=('Helvetica', 10, 'bold'))

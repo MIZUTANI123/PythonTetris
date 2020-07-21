@@ -25,6 +25,7 @@ class Stage:
         self.remove_line = [False for i in range(Stage.HEIGHT)]
         self.is_fix = False
         self.__select_block()
+        self.cnt = 0
 
 
     def update(self):
@@ -267,6 +268,8 @@ class Stage:
             if self.remove_line[i]:
                 for j in range(Stage.WIDTH):
                     self.data[i][j] = Stage.NONE
+                self.cnt +=1
+                print(self.cnt)
 
         # 置き換え先の列を参照するポインタ
         idx = Stage.HEIGHT - 1
