@@ -3,6 +3,8 @@ import stage
 import block
 
 
+
+
 class Game:
     """
     class for managing the whole game
@@ -22,8 +24,10 @@ class Game:
         self.root = tkinter.Tk()
         self.root.bind('<KeyPress>', self.__input)
         self.canvas = tkinter.Canvas(self.root, width=self.width, height=self.height, bg='black')
-
         self.stage = stage.Stage()
+
+
+
 
         self.img_blocks = [tkinter.PhotoImage(file='o.png'),
                            tkinter.PhotoImage(file='i.png'),
@@ -32,9 +36,9 @@ class Game:
                            tkinter.PhotoImage(file='s.png'),
                            tkinter.PhotoImage(file='z.png'),
                            tkinter.PhotoImage(file='t.png')]
-
         self.img_shadow = tkinter.PhotoImage(file='shadow.png')
-        self.img_game_over = tkinter.PhotoImage(file='game_over.png')
+        self.img_game_over_block = tkinter.PhotoImage(file='game_over.png')
+        self.img_game_over = tkinter.PhotoImage(file='gmover.png')
         self.speed = 300
 
     def start(self):
@@ -48,7 +52,6 @@ class Game:
         gameの初期化を行うメソッド
         """
         self.__make_window()
-        self.__display_score()
         self.__game_loop()
         self.root.mainloop()
 
@@ -65,10 +68,12 @@ class Game:
         """
         self.__update()
         self.__render()
+        self.__render_right_section()
         if not self.stage.is_end():
             self.root.after(self.speed, self.__game_loop)
         else:
             self.__render(True)
+            self.__render_right_section()
 
 
     def __input(self, e):
@@ -84,7 +89,7 @@ class Game:
         self.stage.update()
         if self.stage.is_fix:
             #速度を変更
-            self.speed -= 1
+            self.speed -= 10
 
 
     def __render(self, is_end=False):
@@ -92,6 +97,7 @@ class Game:
         gameの描画処理を定義するメソッド
         """
         self.canvas.delete('block')
+        self.canvas.delete('score')
 
         for y in range(stage.Stage.HEIGHT):
             for x in range(stage.Stage.WIDTH):
@@ -101,8 +107,10 @@ class Game:
                     #GameOver処理を描画
                     if cell_data in stage.Stage.FIX:
                         # ゲームオーバーのブロックを描画する
-                        self.canvas.create_image(x * block.Block.SCALE, y * block.Block.SCALE, image=self.img_game_over,
+                        self.canvas.create_image(x * block.Block.SCALE, y * block.Block.SCALE, image=self.img_game_over_block,
                                                  anchor='nw', tag='block')
+                        self.canvas.create_image(0, self.height/2-32, image=self.img_game_over, anchor='w',
+                                                 tag='game_over')
                 else:
                     #Game画面を描画
                     """
@@ -124,8 +132,10 @@ class Game:
                         # Fixの画像を描画する。
                         self.canvas.create_image(x * block.Block.SCALE, y * block.Block.SCALE, image=self.img_blocks[cell_data-20], anchor='nw', tag='block')
 
+
         self.__render_shadow(is_end)
         self.__display_score(is_end)
+
 
 
 
@@ -161,5 +171,48 @@ class Game:
                                                      tag='block')
                         """
 
+
     def __display_score(self, is_end=False):
-        self.canvas.create_text(40, 20, text='score = ' + str(self.stage.cnt), fill='white', font=('Helvetica', 10, 'bold'))
+        self.canvas.create_text(40, 20, text='score = ' + str(self.stage.score) +'\n line = ' + str(self.stage.lines),
+                                fill='white', font=('Helvetica', 10), tag='score')
+
+
+    def __render_right_section(self, is_end=False):
+        self.canvas.create_text((stage.Stage.WIDTH + 2)*block.Block.SCALE, 20, text='next block',
+                                fill='white', font=('Helvetica', 10), tag='next')
+
+        right_start_w = stage.Stage.WIDTH + 1
+        right_start_h = 1
+
+        for y in range(right_start_h, right_start_h + block.Block.SIZE+1):
+            for x in range(right_start_w, right_start_w + block.Block.SIZE+1):
+                self.canvas.create_rectangle(x * block.Block.SCALE,  # x0座標
+                                             y * block.Block.SCALE,  # y0座標
+                                             (x+1) * block.Block.SCALE,  # x1座標
+                                             (y+1) * block.Block.SCALE,  # y1座標
+                                             fill='white',  # 装飾色
+                                             outline='white',
+                                             tag='block')
+        b_t = self.stage.next_type
+        b_r = self.stage.next_rot
+
+        for i in range(block.Block.SIZE):
+            for j in range(block.Block.SIZE):
+                cell_data = self.stage.block.get_cell_data(b_t, b_r, j, i)
+                if cell_data in stage.Stage.BLOCK:
+                    self.canvas.create_image(
+                        (right_start_w + 0.5 + j ) * block.Block.SCALE,  # x座標
+                        (right_start_h + 0.5 + i) * block.Block.SCALE,  # y座標
+                        image=self.img_blocks[cell_data - 10],  # 描画画像
+                        anchor='nw',  # アンカー
+                        tag='block'  # タグ
+                    )
+
+
+
+
+
+
+
+
+

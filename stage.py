@@ -1,6 +1,7 @@
 import block
 import random
 
+
 class Stage:
     """
     テトリスの盤面を管理するクラスです。
@@ -8,8 +9,10 @@ class Stage:
     WIDTH = 10 # 盤面の幅
     HEIGHT = 20 # 盤面の幅高さ
     NONE = 0 # 空マス
+    #GRAY = 100
     BLOCK = [10, 11, 12, 13, 14, 15, 16] # ブロックマス
     FIX = [20, 21, 22, 23, 24, 25, 26, 27] #固定ブロックマス
+
     #BLOCK = 1 # ブロックマス
     #FIX = 2 # 固定ブロックマス
 
@@ -18,14 +21,21 @@ class Stage:
         盤面の生成
         """
         self.data = [[Stage.NONE for i in range(Stage.WIDTH)] for j in range(Stage.HEIGHT)]
+        #self.right = [[Stage.GRAY for i in range(Stage.WIDTH, block.Block.SIZE+2)] for j in range(Stage.HEIGHT)]
         self.block = block.Block()
+
         self.type = 0
         self.rot = 0
+        self.next_type = 0
+        self.next_rot = 0
         self.can_drop = True
         self.remove_line = [False for i in range(Stage.HEIGHT)]
         self.is_fix = False
         self.__select_block()
+        self.__select_next_block()
         self.cnt = 0
+        self.lines = 0
+        self.score = 0
 
 
     def update(self):
@@ -45,8 +55,12 @@ class Stage:
             self.__fix_block()
             self.check_remove_lines()
             self.remove_lines()
+            self.add_scores()
             self.block.reset()
-            self.__select_block()
+            self.type = self.next_type
+            self.rot = self.next_rot
+            self.__select_next_block()
+
 
 
 
@@ -78,6 +92,15 @@ class Stage:
         """
         self.type = random.randint(0, block.Block.TYPE_MAX-1)
         self.rot = random.randint(0, block.Block.ROT_MAX-1)
+
+
+    def __select_next_block(self):
+        """
+        blockのタイプと角度をランダムに選択する。
+        """
+        self.next_type = random.randint(0, block.Block.TYPE_MAX-1)
+        self.next_rot = random.randint(0, block.Block.ROT_MAX-1)
+
 
     def __rotation_block(self):
         if self.__can_rotation_block():
@@ -134,8 +157,6 @@ class Stage:
                 if self.block.get_cell_data(b_t, b_r, j, i) in Stage.BLOCK:
                     if not self.is_out_of_stage(b_x + j, b_y + i):
                         self.data[b_y + i][b_x + j] = self.block.get_cell_data(b_t, b_r, j, i)
-                        #self.data[b_y + i][b_x + j] = Stage.BLOCK
-
 
     def __fix_block(self):
         """
@@ -150,7 +171,6 @@ class Stage:
             for j in range(block.Block.SIZE):
                 if self.block.get_cell_data(b_t, b_r, j, i) in Stage.BLOCK:
                     self.data[b_y + i][b_x + j] = self.block.get_cell_data(b_t, b_r, j, i) + 10
-                    #self.data[b_y + i][b_x + j] = Stage.FIX
 
 
     def is_out_of_stage(self, x, y):
@@ -261,6 +281,7 @@ class Stage:
             self.remove_line[i] = flg
 
 
+
     def remove_lines(self):
 
         # そろっている列を削除
@@ -269,7 +290,6 @@ class Stage:
                 for j in range(Stage.WIDTH):
                     self.data[i][j] = Stage.NONE
                 self.cnt +=1
-                print(self.cnt)
 
         # 置き換え先の列を参照するポインタ
         idx = Stage.HEIGHT - 1
@@ -279,7 +299,13 @@ class Stage:
             if not self.remove_line[i]:
                 for j in range(Stage.WIDTH):
                     self.data[idx][j] = self.data[i][j]
-                idx -=1
+                idx -= 1
+
+    def add_scores(self):
+        if self.cnt != 0:
+            self.lines += self.cnt
+            self.score += 100 * pow(2, self.lines - 1)
+            self.cnt = 0
 
     def shadow_position(self):
         """
@@ -315,6 +341,9 @@ class Stage:
                             return True
         # どの条件にも当てはまらない場合は常にどこにも衝突していない
         return False
+
+
+
 
 
 
