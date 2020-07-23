@@ -39,6 +39,7 @@ class Game:
         self.img_shadow = tkinter.PhotoImage(file='shadow.png')
         self.img_game_over_block = tkinter.PhotoImage(file='game_over.png')
         self.img_game_over = tkinter.PhotoImage(file='gmover.png')
+        self.img_gray = tkinter.PhotoImage(file='gray.png')
         self.speed = 300
 
     def start(self):
@@ -178,6 +179,16 @@ class Game:
 
 
     def __render_right_section(self, is_end=False):
+
+        for i in range(stage.Stage.HEIGHT):
+            for j in range(block.Block.SIZE + 3):
+                self.canvas.create_image((stage.Stage.WIDTH + j) * block.Block.SCALE,  # x0座標
+                    i * block.Block.SCALE,  # y0座標
+                    image=self.img_gray,  # 描画画像
+                    anchor='nw',  # アンカー
+                    tag='block'  # タグ
+                )
+
         self.canvas.create_text((stage.Stage.WIDTH + 2)*block.Block.SCALE, 20, text='next block',
                                 fill='white', font=('Helvetica', 10), tag='next')
 
@@ -207,6 +218,7 @@ class Game:
                         anchor='nw',  # アンカー
                         tag='block'  # タグ
                     )
+
 
 
 

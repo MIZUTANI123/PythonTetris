@@ -9,19 +9,15 @@ class Stage:
     WIDTH = 10 # 盤面の幅
     HEIGHT = 20 # 盤面の幅高さ
     NONE = 0 # 空マス
-    #GRAY = 100
-    BLOCK = [10, 11, 12, 13, 14, 15, 16] # ブロックマス
-    FIX = [20, 21, 22, 23, 24, 25, 26, 27] #固定ブロックマス
+    BLOCK = [10, 11, 12, 13, 14, 15, 16]  # ブロックマス
+    FIX = [20, 21, 22, 23, 24, 25, 26, 27] # 固定ブロックマス
 
-    #BLOCK = 1 # ブロックマス
-    #FIX = 2 # 固定ブロックマス
 
     def __init__(self):
         """
         盤面の生成
         """
         self.data = [[Stage.NONE for i in range(Stage.WIDTH)] for j in range(Stage.HEIGHT)]
-        #self.right = [[Stage.GRAY for i in range(Stage.WIDTH, block.Block.SIZE+2)] for j in range(Stage.HEIGHT)]
         self.block = block.Block()
 
         self.type = 0
@@ -57,8 +53,7 @@ class Stage:
             self.remove_lines()
             self.add_scores()
             self.block.reset()
-            self.type = self.next_type
-            self.rot = self.next_rot
+            self.update_block()
             self.__select_next_block()
 
 
@@ -306,6 +301,10 @@ class Stage:
             self.lines += self.cnt
             self.score += 100 * pow(2, self.lines - 1)
             self.cnt = 0
+
+    def update_block(self):
+        self.type = self.next_type
+        self.rot = self.next_rot
 
     def shadow_position(self):
         """
